@@ -1,23 +1,26 @@
 import { useRuntimeConfig } from "#app";
 import axios from "axios";
 
-const update_item = async (update_item: UPDATE_ITEM) => {
+const update_item_api = async (update_item: UPDATE_ITEM[]) => {
   const config = useRuntimeConfig();
-  const { id, total, price } = update_item;
-  const { data } = await axios.put(
-    `${config.public.url}/items/${id}`,
-    {
-      item_id: id,
-      total: total,
-      price: price,
-    },
-    {
-      headers: {
-        "Content-Type": "application/json",
-        Accept: "application/json",
-      },
-    }
+  await Promise.all(
+    update_item.map(async (item) => {
+      await axios.put(
+        `${config.public.url}/items/${item.id}`,
+        {
+          item_id: item.id,
+          total: item.total,
+          price: item.price,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Accept: "application/json",
+          },
+        }
+      );
+    })
   );
 };
 
-export default update_item;
+export default update_item_api;

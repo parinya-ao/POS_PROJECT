@@ -3,6 +3,7 @@
 //!! This code contains critical business logic and domain-specific implementations
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import update_item_api from '~~/utils/put_item';
 import get_items from '../../utils/get_items';
 
 // =====================================================================
@@ -27,12 +28,20 @@ const total_price = computed(() => {
   }, 0)
 })
 // add data to current order
+const vaildate_qutity = (order_item: order_items, stock_item: ITEM) => {
+  return order_item.quantity <= stock_item.total
+}
 const add_to_order = (data: ITEM) => {
   const exist_item = current_order.value.find(item => {
-    item.id === data.id
+    return item.id === data.id
   })
   if (exist_item) {
-    exist_item.quantity++;
+    const stock_item = item.value.find(i => {
+      return i.id == data.id
+    })
+    if (stock_item && vaildate_qutity(exist_item, stock_item)) {
+      exist_item.quantity++;
+    }
   }
   else {
     current_order.value.push({
@@ -46,9 +55,37 @@ const add_to_order = (data: ITEM) => {
 }
 
 
+// complete
+const showSuccess = ref(false);
+const reset_order = () => {
+  current_order.value = [];
+}
+
+// update item_total
+const update_item = ref<UPDATE_ITEM[]>([]);
+
+const submitForm = async () => {
+  if (current_order.value.length === 0) return;
+  update_item.value = current_order.value.map(order_item => {
+    const stockItem = item.value.find(i => i.id === order_item.id);
+    if (!stockItem) return null;
+    return {
+      id: order_item.id,
+      total: stockItem.total - order_item.quantity,
+      price: stockItem.price,
+    };
+  }).filter(Boolean) as UPDATE_ITEM[];
+  // เดี๊ยวมี put item
+  await update_item_api(update_item.value);
+  await fetchItem();
+  showSuccess.value = true;
+  reset_order();
+}
+
 // =====================================================================
 // 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑
 // =====================================================================
+
 </script>
 
 <!-- ============================================================ -->
@@ -69,7 +106,6 @@ const add_to_order = (data: ITEM) => {
 <!-- 13. ✅ Use subtle micro-interactions and fluid transitions for a smooth experience -->
 <!-- 14. ✅ Accessibility First: Ensure WCAG AA compliance for color contrast and typography -->
 <!-- 15. ✅ Optimize for both desktop and mobile with a seamless, responsive design -->
-<!-- **Note:** When encountering <script setup lang="ts">, skip and do not modify this section -->
 
 <!-- AI WRITE HERE -->
 <template>
@@ -78,9 +114,19 @@ const add_to_order = (data: ITEM) => {
     <div class="flex-1 overflow-auto">
       <!-- Header Section -->
       <header class="py-6 px-8 bg-white shadow-sm sticky top-0 z-10">
-        <div class="max-w-7xl mx-auto flex items-center">
-          <UIcon name="i-heroicons-shopping-bag" class="h-7 w-7 text-[#007AFF] mr-3" />
-          <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Point of Sale</h1>
+        <div class="max-w-7xl mx-auto flex items-center justify-between">
+          <div class="flex items-center">
+            <UIcon name="i-heroicons-shopping-bag" class="h-7 w-7 text-[#007AFF] mr-3" />
+            <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Point of Sale</h1>
+          </div>
+          <NuxtLink to="/additem">
+            <UButton color="primary" size="md" class="flex items-center gap-2" :ui="{
+              base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md'
+            }">
+              <UIcon name="i-heroicons-plus" class="h-4 w-4" />
+              <span>Add Item</span>
+            </UButton>
+          </NuxtLink>
         </div>
       </header>
 
@@ -118,10 +164,18 @@ const add_to_order = (data: ITEM) => {
                     <span class="text-sm font-normal text-[#86868B] mr-1">฿</span>{{ itemData.price.toFixed(2) }}
                   </p>
 
-                  <!-- Add to Cart Button -->
-                  <UButton size="md" color="primary" variant="soft" icon="i-heroicons-plus"
-                    @click="add_to_order(itemData)" :ui="{
-                      base: 'rounded-full transition-all duration-200 bg-[#0071E3] text-white hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 shadow-sm hover:shadow-md'
+                  <!-- Add to Cart Button - Updated to use < for validation instead of <= -->
+                  <UButton size="md" color="primary" variant="soft" icon="i-heroicons-plus" @click="() => {
+                    const existItem = current_order.find(item => item.id === itemData.id);
+                    const currentQty = existItem ? existItem.quantity : 0;
+                    // Use < instead of <= for main grid button
+                    if (currentQty < itemData.total) {
+                      add_to_order(itemData);
+                    }
+                  }"
+                    :disabled="(current_order.find(item => item.id === itemData.id)?.quantity || 0) >= itemData.total || itemData.total <= 0"
+                    :ui="{
+                      base: 'rounded-full transition-all duration-200 bg-[#0071E3] text-white hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
                     }" class="h-10 w-10 flex items-center justify-center" />
                 </div>
               </div>
@@ -188,11 +242,28 @@ const add_to_order = (data: ITEM) => {
                         base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full'
                       }" />
                     <input v-model.number="orderItem.quantity" type="number" min="1"
-                      class="text-sm font-medium w-10 text-center bg-transparent focus:outline-none" />
-                    <UButton color="primary" variant="ghost" size="xs" icon="i-heroicons-plus-small"
-                      @click="orderItem.quantity++" class="h-6 w-6" :ui="{
-                        base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full'
-                      }" />
+                      :max="item.find(i => i.id === orderItem.id)?.total || 1" @input="(e) => {
+                        const stockItem = item.find(i => i.id === orderItem.id);
+                        const maxQty = stockItem?.total || 1;
+                        // Ensure quantity doesn't exceed stock
+                        if (orderItem.quantity > maxQty) {
+                          orderItem.quantity = maxQty;
+                        }
+                        // Ensure quantity is at least 1
+                        if (orderItem.quantity < 1) {
+                          orderItem.quantity = 1;
+                        }
+                      }" class="text-sm font-medium w-10 text-center bg-transparent focus:outline-none" />
+                    <UButton color="primary" variant="ghost" size="xs" icon="i-heroicons-plus-small" @click="() => {
+                      const stockItem = item.find(i => i.id === orderItem.id);
+                      if (stockItem && vaildate_qutity({ ...orderItem, quantity: orderItem.quantity + 1 }, stockItem)) {
+                        orderItem.quantity++;
+                      }
+                    }" :disabled="!item.find(i => i.id === orderItem.id) ||
+                      !vaildate_qutity({ ...orderItem, quantity: orderItem.quantity + 1 },
+                        item.find(i => i.id === orderItem.id)!)" class="h-6 w-6" :ui="{
+                          base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full disabled:opacity-50 disabled:cursor-not-allowed'
+                        }" />
                   </div>
 
                   <!-- Subtotal -->
@@ -213,17 +284,6 @@ const add_to_order = (data: ITEM) => {
       <!-- Order Summary -->
       <div class="p-6 bg-gray-50 border-t border-gray-200">
         <div class="space-y-3">
-          <!-- Subtotal -->
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-[#86868B]">Subtotal</span>
-            <span class="text-[#1D1D1F]">฿{{ total_price.toFixed(2) }}</span>
-          </div>
-
-          <!-- Tax (optional, can be removed if not needed) -->
-          <div class="flex justify-between items-center text-sm">
-            <span class="text-[#86868B]">Tax (7%)</span>
-            <span class="text-[#1D1D1F]">฿{{ (total_price * 0.07).toFixed(2) }}</span>
-          </div>
 
           <!-- Divider -->
           <div class="border-t border-gray-200 my-2"></div>
@@ -231,17 +291,19 @@ const add_to_order = (data: ITEM) => {
           <!-- Total -->
           <div class="flex justify-between font-medium text-black">
             <span>Total</span>
-            <span class="text-[#007AFF]">฿{{ (total_price * 1.07).toFixed(2) }}</span>
+            <span class="text-[#007AFF]">฿{{ (total_price).toFixed(2) }}</span>
           </div>
         </div>
 
         <!-- Checkout Button -->
-        <UButton class="w-full mt-6" color="primary" size="lg" rounded="xl" :disabled="current_order.length === 0" :ui="{
-          base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-[0.98] transition-all duration-200'
-        }">
+        <UButton class="w-full mt-6" color="primary" size="lg" rounded="xl" :disabled="current_order.length === 0"
+          @click="submitForm" :ui="{
+            base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-[0.98] transition-all duration-200'
+          }">
           Complete Payment
         </UButton>
       </div>
     </div>
+
   </div>
 </template>

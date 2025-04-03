@@ -155,6 +155,19 @@ const submitForm = async () => {
   <div class="min-h-screen bg-[#F5F5F7] dark:bg-[#1C1C1E] px-4 py-8 md:px-6 lg:px-8">
     <!-- Header section -->
     <UContainer class="max-w-3xl mx-auto">
+      <!-- Back button to index page -->
+      <div class="mb-6 flex items-center">
+        <NuxtLink to="/">
+          <UButton color="gray" variant="ghost" size="md" class="group flex items-center gap-2 -ml-2" :ui="{
+            base: 'hover:bg-[#F2F2F7] dark:hover:bg-[#2C2C2E] active:scale-95 transition-all duration-200'
+          }">
+            <UIcon name="i-heroicons-arrow-left"
+              class="h-5 w-5 text-[#007AFF] transition-transform group-hover:-translate-x-0.5" />
+            <span class="text-[#007AFF]">กลับไปหน้าหลัก</span>
+          </UButton>
+        </NuxtLink>
+      </div>
+
       <!-- Success notification component -->
       <AddItemSuccess v-if="showSuccess" @close="showSuccess = false" />
 
