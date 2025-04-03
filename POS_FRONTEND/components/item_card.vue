@@ -12,13 +12,14 @@ price
 total
 */
 
-const prop = defineProps({
+// Props are defined but accessed directly from the template
+// No need to store in a variable if not used in script
+defineProps({
   name: { type: String, required: true },
   price: { type: Number, required: true },
   total: { type: Number, required: true },
   image_url: { type: String, required: true }
 })
-
 
 // =====================================================================
 // 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑

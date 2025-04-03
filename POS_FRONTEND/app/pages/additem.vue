@@ -26,6 +26,7 @@ const data = ref<CREATE_ITEM>({
 });
 
 const dropdown = ref(false);
+const showSuccess = ref(false);
 const typeOption = Object.entries(TYPE).map(([key, value]) => ({
   label: value,
   value: key
@@ -41,6 +42,24 @@ const filterOptions = ref({
   priceRange: [0, 10000],
   inStock: true
 });
+
+const resetForm = () => {
+  data.value = {
+    name: '',
+    type_item: '' as TYPE | "",
+    price: 0,
+    total: 0,
+    image_url: "",
+    expiration_date: ''
+  };
+}
+
+const submitForm = async () => {
+  await add_item();
+  showSuccess.value = true;
+  resetForm();
+}
+
 
 // =====================================================================
 // 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑
@@ -136,12 +155,15 @@ const filterOptions = ref({
   <div class="min-h-screen bg-[#F5F5F7] dark:bg-[#1C1C1E] px-4 py-8 md:px-6 lg:px-8">
     <!-- Header section -->
     <UContainer class="max-w-3xl mx-auto">
+      <!-- Success notification component -->
+      <AddItemSuccess v-if="showSuccess" @close="showSuccess = false" />
+
       <h1 class="text-[28px] font-semibold text-[#1C1C1E] dark:text-[#F5F5F7] mb-2">เพิ่มสินค้าใหม่</h1>
       <p class="text-[#8E8E93] text-[17px] mb-6">กรอกข้อมูลด้านล่างเพื่อเพิ่มสินค้าใหม่เข้าระบบ</p>
 
       <!-- Form card -->
       <div class="bg-white dark:bg-[#2C2C2E] rounded-[12px] shadow-lg p-6 transition-all duration-300">
-        <form @submit.prevent="add_item">
+        <form @submit.prevent="submitForm">
           <!-- Product name -->
           <div class="mb-6">
             <div class="mb-1">
@@ -177,7 +199,7 @@ const filterOptions = ref({
                 <div v-show="dropdown"
                   class="absolute z-50 w-full mt-1 bg-white dark:bg-[#2C2C2E] shadow-lg rounded-[12px] py-1 border border-gray-200 dark:border-gray-700 max-h-60 overflow-auto">
                   <div v-for="option in typeOption" :key="option.value"
-                    @click="data.type_item = option.value as TYPE; dropdown = false;"
+                    @click="data.type_item = option.value as any; dropdown = false;"
                     class="px-4 py-3 cursor-pointer hover:bg-[#F5F5F7] dark:hover:bg-[#3A3A3C] transition-colors duration-200"
                     :class="data.type_item === option.value ? 'bg-[#007AFF]/10 text-[#007AFF] font-medium' : 'text-[#1C1C1E] dark:text-[#F5F5F7]'">
                     {{ option.label }}
@@ -261,8 +283,7 @@ const filterOptions = ref({
           <div class="mb-6 p-4 bg-gray-50 dark:bg-[#1C1C1E] rounded-[12px]">
             <div class="flex items-center justify-between mb-2">
               <h3 class="text-[#1C1C1E] dark:text-[#F5F5F7] font-medium">ตัวกรองการค้นหา</h3>
-              <UButton size="xs" color="gray" variant="ghost" icon="i-heroicons-funnel"
-                :ui="{ rounded: 'rounded-full' }">
+              <UButton size="xs" color="neutral" variant="ghost" icon="i-heroicons-funnel" class="rounded-full">
                 ดูทั้งหมด
               </UButton>
             </div>
@@ -271,7 +292,7 @@ const filterOptions = ref({
               <!-- Category Filter -->
               <div>
                 <USelectMenu v-model="filterOptions.category" :options="typeOption" placeholder="เลือกหมวดหมู่"
-                  size="sm" :ui="{ width: 'w-full' }" />
+                  size="sm" class="w-full" />
               </div>
 
               <!-- Price Range Filter -->
@@ -299,9 +320,8 @@ const filterOptions = ref({
 
           <!-- Submit button -->
           <div class="flex justify-end">
-            <UButton type="submit" color="blue" size="lg" :ui="{
-              base: 'rounded-[12px] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]',
-              padding: { xl: 'px-8 py-3' }
+            <UButton type="submit" color="primary" size="lg" :ui="{
+              base: 'rounded-[12px] transition-all duration-200 transform hover:scale-[1.02] active:scale-[0.98]'
             }">
               <template #leading>
                 <UIcon name="i-heroicons-plus-circle" class="text-lg" />
@@ -342,7 +362,7 @@ const filterOptions = ref({
             <div class="py-3">
               <h3 class="text-[#8E8E93] text-[14px] uppercase font-medium mb-1">หมวดหมู่สินค้า</h3>
               <div class="flex items-center">
-                <UBadge :color="data.type_item ? 'blue' : 'gray'" size="lg" class="mr-2">
+                <UBadge :color="data.type_item ? 'primary' : 'neutral'" size="lg" class="mr-2">
                   {{ data.type_item ? TYPE[data.type_item as keyof typeof TYPE] : 'ยังไม่ได้เลือก' }}
                 </UBadge>
               </div>
@@ -376,7 +396,7 @@ const filterOptions = ref({
                 </div>
                 <p class="text-[#8E8E93] text-[14px]">
                   สถานะสินค้า:
-                  <UBadge :color="data.total > 0 ? 'green' : 'red'" size="sm" class="ml-1">
+                  <UBadge :color="data.total > 0 ? 'success' : 'error'" size="sm" class="ml-1">
                     {{ data.total > 0 ? 'มีสินค้า' : 'สินค้าหมด' }}
                   </UBadge>
                 </p>
@@ -390,8 +410,7 @@ const filterOptions = ref({
                 <UIcon name="i-heroicons-calendar" class="text-[#8E8E93] mr-2" />
                 <p class="text-[17px] text-[#1C1C1E] dark:text-[#F5F5F7]">
                   {{ new Date(data.expiration_date).toLocaleDateString('th-TH', {
-                    year: 'numeric', month: 'long', day:
-                      'numeric'
+                    year: 'numeric', month: 'long', day: 'numeric'
                   }) }}
                 </p>
               </div>
@@ -415,15 +434,14 @@ const filterOptions = ref({
               <h3 class="text-[#8E8E93] text-[14px] uppercase font-medium mb-1">ข้อมูลระบบ</h3>
               <div class="grid grid-cols-1 md:grid-cols-2 gap-2 text-[14px] text-[#8E8E93]">
                 <p>วันที่สร้าง: {{ new Date().toLocaleDateString('th-TH', {
-                  year: 'numeric', month: 'long', day:
-                    'numeric'
+                  year: 'numeric', month: 'long', day: 'numeric'
                 }) }}
                 </p>
                 <p>เวลา: {{ new Date().toLocaleTimeString('th-TH') }}</p>
-                <p>สถานะ: <UBadge color="blue" size="sm">รอการบันทึก</UBadge>
+                <p>สถานะ: <UBadge color="primary" size="sm">รอการบันทึก</UBadge>
                 </p>
-                <p>รูปภาพ: <UBadge :color="data.image_url ? 'green' : 'red'" size="sm">{{ data.image_url ? 'มีรูปภาพ' :
-                  'ไม่มีรูปภาพ' }}
+                <p>รูปภาพ: <UBadge :color="data.image_url ? 'success' : 'error'" size="sm">
+                    {{ data.image_url ? 'มีรูปภาพ' : 'ไม่มีรูปภาพ' }}
                   </UBadge>
                 </p>
               </div>

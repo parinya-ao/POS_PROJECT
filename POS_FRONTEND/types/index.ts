@@ -1,6 +1,6 @@
 import type { TYPE } from "./type";
 
-export type { ITEM, TYPE };
+export type { ITEM };
 
 declare global {
   interface ITEM {

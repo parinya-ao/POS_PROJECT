@@ -1,75 +1,54 @@
-# Nuxt UI Starter
+# คู่มือการใช้งานโปรเจค POS (Point of Sale)
 
-Look at [Nuxt docs](https://nuxt.com/docs/getting-started/introduction) and [Nuxt UI docs](https://ui.nuxt.com) to learn more.
+## การติดตั้ง
 
-## Setup
+โปรเจคนี้ใช้ `bun` ในการจัดการแพ็คเกจเท่านั้น กรุณาติดตั้ง `bun` ก่อนเริ่มต้น ([ดูวิธีการติดตั้ง Bun](https://bun.sh/))
 
-Make sure to install the dependencies:
+หลังจากติดตั้ง `bun` แล้ว ให้รันคำสั่งต่อไปนี้เพื่อดาวน์โหลด dependencies:
 
 ```bash
-# npm
-npm install
-
-# pnpm
-pnpm install
-
-# yarn
-yarn install
-
-# bun
 bun install
 ```
 
-## Development Server
+## การรันโปรเจคในโหมดพัฒนา
 
-Start the development server on `http://localhost:3000`:
+รันเซิร์ฟเวอร์สำหรับการพัฒนาได้ที่ `http://localhost:3000` โดยใช้คำสั่ง:
 
 ```bash
-# npm
-npm run dev
-
-# pnpm
-pnpm run dev
-
-# yarn
-yarn dev
-
-# bun
 bun run dev
 ```
 
-## Production
+## การสร้างโปรเจคสำหรับ Production
 
-Build the application for production:
+สร้างแอปพลิเคชันสำหรับใช้งานใน Production ด้วยคำสั่ง:
 
 ```bash
-# npm
-npm run build
-
-# pnpm
-pnpm run build
-
-# yarn
-yarn build
-
-# bun
 bun run build
 ```
 
-Locally preview production build:
+## การทดสอบโปรเจคในโหมด Production
+
+หลังจากสร้างโปรเจคสำหรับ Production แล้ว สามารถทดสอบได้โดยใช้คำสั่ง:
 
 ```bash
-# npm
-npm run preview
-
-# pnpm
-pnpm run preview
-
-# yarn
-yarn preview
-
-# bun
 bun run preview
 ```
 
-Check out the [deployment documentation](https://nuxt.com/docs/getting-started/deployment) for more information.
+## โครงสร้างโปรเจค
+
+- **POS_BACKEND/**: โฟลเดอร์สำหรับโค้ดฝั่ง Backend
+
+  - `main.py`: ไฟล์หลักสำหรับรัน Backend
+  - `database.py`: การจัดการฐานข้อมูล
+  - `internal/`: โค้ดภายในที่ไม่ควรถูกเข้าถึงจากภายนอก
+  - `routers/`: การจัดการ API Routes
+
+- **POS_FRONTEND/**: โฟลเดอร์สำหรับโค้ดฝั่ง Frontend
+  - `app/`: การตั้งค่าและโครงสร้างของแอปพลิเคชัน
+  - `pages/`: ไฟล์ Vue สำหรับแต่ละหน้า
+  - `components/`: คอมโพเนนต์ที่ใช้ซ้ำได้
+  - `utils/`: ฟังก์ชันช่วยเหลือสำหรับการเรียก API
+
+## หมายเหตุ
+
+โปรเจคนี้เป็นโปรเจคส่วนตัว ห้ามนำไปใช้หรือดัดแปลงโดยไม่ได้รับอนุญาต
