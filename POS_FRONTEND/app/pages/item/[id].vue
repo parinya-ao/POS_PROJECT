@@ -174,8 +174,8 @@ onMounted(() => {
               </div>
 
               <!-- Item Type Badge (Overlay) -->
-              <UBadge v-if="one_item.type" color="white" variant="solid"
-                class="absolute top-4 right-4 text-xs font-medium px-3 py-1 shadow-sm">
+              <UBadge v-if="one_item.type" color="neutral" variant="solid"
+                class="absolute top-4 right-4 text-xs font-medium px-3 py-1 shadow-sm bg-white text-gray-800">
                 {{ one_item.type }}
               </UBadge>
             </div>
@@ -189,7 +189,7 @@ onMounted(() => {
                 <h2 class="text-3xl font-semibold text-gray-900 tracking-tight">{{ one_item.name }}</h2>
                 <div class="mt-2 flex items-baseline">
                   <span class="text-2xl font-bold text-gray-900">฿{{ one_item.price?.toLocaleString(undefined,
-                    { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
+                    { minimumFractionDigits: 0, maximumFractionDigits: 0 }) }}</span>
                 </div>
               </div>
 
@@ -225,7 +225,7 @@ onMounted(() => {
                 <UIcon name="i-heroicons-shopping-cart" class="mr-2 h-5 w-5" />
                 {{ one_item.total > 0 ? 'Add to Cart' : 'Out of Stock' }}
               </UButton>
-              <UButton color="gray" variant="soft" size="lg" block to="/">
+              <UButton color="neutral" variant="soft" size="lg" block to="/">
                 <UIcon name="i-heroicons-arrow-left" class="mr-2 h-5 w-5" />
                 Back to All Items
               </UButton>

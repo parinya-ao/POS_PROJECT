@@ -55,11 +55,14 @@ const resetForm = () => {
 }
 
 const submitForm = async () => {
+  // If expiration_date is empty, set it to the maximum timestamp (end of Unix epoch time)
+  if (!data.value.expiration_date) {
+    data.value.expiration_date = '9999-12-31'; // Using a far future date as "never expires"
+  }
   await add_item();
   showSuccess.value = true;
   resetForm();
 }
-
 
 // =====================================================================
 // 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑
@@ -158,7 +161,7 @@ const submitForm = async () => {
       <!-- Back button to index page -->
       <div class="mb-6 flex items-center">
         <NuxtLink to="/">
-          <UButton color="gray" variant="ghost" size="md" class="group flex items-center gap-2 -ml-2" :ui="{
+          <UButton color="primary" variant="ghost" size="md" class="group flex items-center gap-2 -ml-2" :ui="{
             base: 'hover:bg-[#F2F2F7] dark:hover:bg-[#2C2C2E] active:scale-95 transition-all duration-200'
           }">
             <UIcon name="i-heroicons-arrow-left"
@@ -386,14 +389,14 @@ const submitForm = async () => {
                 <h3 class="text-[#8E8E93] text-[14px] uppercase font-medium mb-1">ข้อมูลราคา</h3>
                 <p class="text-[24px] font-semibold text-[#1C1C1E] dark:text-[#F5F5F7]">
                   {{ data.price ? `฿${Number(data.price).toLocaleString('th-TH', {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2
-                  })}` : '฿0.00' }}
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0
+                  })}` : '฿0' }}
                 </p>
                 <p class="text-[#8E8E93] text-[14px]">
                   {{ data.price && data.total ? `มูลค่ารวม: ฿${(Number(data.price) *
                     Number(data.total)).toLocaleString('th-TH',
-                      { minimumFractionDigits: 2, maximumFractionDigits: 2 })}` : 'มูลค่ารวม: ฿0.00' }}
+                      { minimumFractionDigits: 0, maximumFractionDigits: 0 })}` : 'มูลค่ารวม: ฿0' }}
                 </p>
               </div>
 

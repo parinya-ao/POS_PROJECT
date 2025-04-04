@@ -45,3 +45,10 @@ class Item(SQLModel, table=True):
     expiration_date: Optional[date] = Field(default=None, index=True)
     image_url: Optional[str] = Field(default=None, index=True)
     update_at: datetime = Field(default_factory=datetime.now, index=True)
+
+
+class Transaction(SQLModel, table=True):
+    id: Optional[int] = Field(default=None, primary_key=True)
+    item_id: int = Field(foreign_key="item.id")
+    quantity_sold: int
+    sold_at: datetime = Field(default_factory=datetime.now, index=True)

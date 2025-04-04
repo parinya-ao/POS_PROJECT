@@ -51,7 +51,7 @@ defineProps({
 
         <div class="mt-auto pt-4 flex justify-between items-center">
           <p class="text-xl font-semibold text-[#1D1D1F]">
-            <span class="text-sm font-normal text-[#86868B] mr-1">฿</span>{{ price.toFixed(2) }}
+            <span class="text-sm font-normal text-[#86868B] mr-1">฿</span>{{ price.toFixed(0) }}
           </p>
 
           <!-- Add to Cart Button with Apple styling -->

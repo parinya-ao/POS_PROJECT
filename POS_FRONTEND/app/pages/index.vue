@@ -2,6 +2,7 @@
 //!! Any modifications to the script section below will be rejected
 //!! This code contains critical business logic and domain-specific implementations
 <script setup lang="ts">
+import ping from '~~/utils/ping';
 import update_item_api from '~~/utils/put_item';
 import type { ITEM } from '../../types';
 import type { order_items } from '../../types/order_items';
@@ -84,11 +85,29 @@ const submitForm = async () => {
   reset_order();
 }
 
-// =====================================================================
-// 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑
-// =====================================================================
+const isConnected = ref(false);
+const pingInterval = ref<NodeJS.Timeout | null>(null);
+
+const checkConnection = async () => {
+  isConnected.value = await ping();
+};
+
+onMounted(() => {
+  checkConnection();
+  pingInterval.value = setInterval(checkConnection, 5000);
+});
+
+onUnmounted(() => {
+  if (pingInterval.value) {
+    clearInterval(pingInterval.value);
+    pingInterval.value = null;
+  }
+});
 
 </script>
+<!-- // =====================================================================
+// 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑
+// ===================================================================== -->
 
 <!-- ============================================================ -->
 <!-- AI ASSISTANT GUIDELINES - READ CAREFULLY - DO NOT DELETE -->
@@ -121,14 +140,30 @@ const submitForm = async () => {
             <UIcon name="i-heroicons-shopping-bag" class="h-7 w-7 text-[#007AFF] mr-3" />
             <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Point of Sale</h1>
           </div>
-          <NuxtLink to="/additem">
-            <UButton color="primary" size="md" class="flex items-center gap-2" :ui="{
-              base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md'
-            }">
-              <UIcon name="i-heroicons-plus" class="h-4 w-4" />
-              <span>Add Item</span>
-            </UButton>
-          </NuxtLink>
+
+          <div class="flex items-center space-x-3">
+            <!-- Connection Status Indicator -->
+            <div class="flex items-center space-x-2 mr-4">
+              <span class="flex h-3 w-3 relative">
+                <span :class="isConnected ? 'bg-green-500' : 'bg-red-500'"
+                  class="animate-ping absolute inline-flex h-full w-full rounded-full opacity-75"></span>
+                <span :class="isConnected ? 'bg-green-400' : 'bg-red-400'"
+                  class="relative inline-flex rounded-full h-3 w-3"></span>
+              </span>
+              <span class="text-sm font-medium" :class="isConnected ? 'text-green-600' : 'text-red-600'">
+                {{ isConnected ? 'Connected database' : 'Disconnected database' }}
+              </span>
+            </div>
+
+            <NuxtLink to="/additem">
+              <UButton color="primary" size="md" class="flex items-center gap-2" :ui="{
+                base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md'
+              }">
+                <UIcon name="i-heroicons-plus" class="h-4 w-4" />
+                <span>Add Item</span>
+              </UButton>
+            </NuxtLink>
+          </div>
         </div>
       </header>
 

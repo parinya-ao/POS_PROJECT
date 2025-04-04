@@ -2,7 +2,7 @@ from fastapi import FastAPI, Depends, HTTPException, Query
 from database import create_db_and_tabls
 
 # import from router
-from routers import items
+from routers import items, transactions
 
 app = FastAPI()
 
@@ -31,3 +31,4 @@ def root():
 
 
 app.include_router(items.router)
+app.include_router(transactions.router)

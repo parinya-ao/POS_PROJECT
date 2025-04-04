@@ -2,17 +2,125 @@
 @import "@nuxt/ui";
 
 @theme static {
-  --font-sans: 'Public Sans', sans-serif;
+  --font-sans: -apple-system, BlinkMacSystemFont, "San Francisco",
+    "Helvetica Neue", sans-serif;
 
-  --color-green-50: #effdf5;
-  --color-green-100: #d9fbe8;
-  --color-green-200: #b3f5d1;
-  --color-green-300: #75edae;
-  --color-green-400: #00dc82;
-  --color-green-500: #00c16a;
-  --color-green-600: #00a155;
-  --color-green-700: #007f45;
-  --color-green-800: #016538;
-  --color-green-900: #0a5331;
-  --color-green-950: #052e16;
+  /* Color System */
+  --color-primary: #007aff;
+  --color-secondary: #8e8e93;
+  --color-background-light: #f5f5f7;
+  --color-background-dark: #1c1c1e;
+  --color-text-light: #1c1c1e;
+  --color-text-dark: #f5f5f7;
+  --color-success: #34c759;
+  --color-warning: #ff9500;
+  --color-error: #ff3b30;
+
+  /* Rounded corners */
+  --border-radius: 12px;
+
+  /* Typography */
+  --font-size-h1: 28px;
+  --font-size-h2: 24px;
+  --font-size-body: 17px;
+  --font-size-small: 14px;
+
+  /* Spacing Scale */
+  --spacing-1: 4px;
+  --spacing-2: 8px;
+  --spacing-3: 12px;
+  --spacing-4: 16px;
+  --spacing-5: 24px;
+  --spacing-6: 32px;
+
+  /* Shadows */
+  --box-shadow: rgba(0, 0, 0, 0.1) 0px 4px 10px;
+
+  /* Animations */
+  --animation-duration: 300ms;
+  --transition-timing: cubic-bezier(0.4, 0, 0.2, 1);
+
+  /* Z-index layers */
+  --z-index-modal: 1000;
+  --z-index-dropdown: 900;
+  --z-index-tooltip: 950;
+}
+
+:root {
+  font-family: var(--font-sans);
+}
+
+/* Light mode (default) */
+body {
+  background-color: var(--color-background-light);
+  color: var(--color-text-light);
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: var(--color-background-dark);
+    color: var(--color-text-dark);
+  }
+}
+
+/* Buttons and interactive elements */
+button,
+.btn,
+.button {
+  border-radius: var(--border-radius);
+  transition: all var(--animation-duration) var(--transition-timing);
+}
+
+/* Primary buttons */
+.btn-primary,
+.button-primary {
+  background-color: var(--color-primary);
+  color: white;
+}
+
+/* Cards and containers */
+.card,
+.container,
+.modal,
+.dialog {
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+}
+
+/* Typography classes */
+h1,
+.h1 {
+  font-size: var(--font-size-h1);
+}
+h2,
+.h2 {
+  font-size: var(--font-size-h2);
+}
+.body {
+  font-size: var(--font-size-body);
+}
+.text-small {
+  font-size: var(--font-size-small);
+}
+
+/* Status colors */
+.success {
+  color: var(--color-success);
+}
+.warning {
+  color: var(--color-warning);
+}
+.error {
+  color: var(--color-error);
+}
+
+.bg-success {
+  background-color: var(--color-success);
+}
+.bg-warning {
+  background-color: var(--color-warning);
+}
+.bg-error {
+  background-color: var(--color-error);
 }
