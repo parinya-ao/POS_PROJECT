@@ -168,8 +168,6 @@ const submitForm = async () => {
         </NuxtLink>
       </div>
 
-      <!-- Success notification component -->
-      <AddItemSuccess v-if="showSuccess" @close="showSuccess = false" />
 
       <h1 class="text-[28px] font-semibold text-[#1C1C1E] dark:text-[#F5F5F7] mb-2">เพิ่มสินค้าใหม่</h1>
       <p class="text-[#8E8E93] text-[17px] mb-6">กรอกข้อมูลด้านล่างเพื่อเพิ่มสินค้าใหม่เข้าระบบ</p>

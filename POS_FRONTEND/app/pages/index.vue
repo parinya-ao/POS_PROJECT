@@ -2,8 +2,10 @@
 //!! Any modifications to the script section below will be rejected
 //!! This code contains critical business logic and domain-specific implementations
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
 import update_item_api from '~~/utils/put_item';
+import type { ITEM } from '../../types';
+import type { order_items } from '../../types/order_items';
+import type { UPDATE_ITEM } from '../../types/update_item';
 import get_items from '../../utils/get_items';
 
 // =====================================================================
@@ -23,7 +25,7 @@ onMounted(() => {
 // current order zone
 const current_order = ref<order_items[]>([]);
 const total_price = computed(() => {
-  return current_order.value.reduce((acc, item) => {
+  return current_order.value.reduce((acc: number, item: { price: number; quantity: number; }) => {
     return acc + item.price * item.quantity;
   }, 0)
 })
@@ -32,11 +34,11 @@ const vaildate_qutity = (order_item: order_items, stock_item: ITEM) => {
   return order_item.quantity <= stock_item.total
 }
 const add_to_order = (data: ITEM) => {
-  const exist_item = current_order.value.find(item => {
+  const exist_item = current_order.value.find((item: { id: number; }) => {
     return item.id === data.id
   })
   if (exist_item) {
-    const stock_item = item.value.find(i => {
+    const stock_item = item.value.find((i: { id: number; }) => {
       return i.id == data.id
     })
     if (stock_item && vaildate_qutity(exist_item, stock_item)) {
@@ -66,8 +68,8 @@ const update_item = ref<UPDATE_ITEM[]>([]);
 
 const submitForm = async () => {
   if (current_order.value.length === 0) return;
-  update_item.value = current_order.value.map(order_item => {
-    const stockItem = item.value.find(i => i.id === order_item.id);
+  update_item.value = current_order.value.map((order_item: { id: number; quantity: number; }) => {
+    const stockItem = item.value.find((i: { id: number; }) => i.id === order_item.id);
     if (!stockItem) return null;
     return {
       id: order_item.id,
@@ -164,16 +166,15 @@ const submitForm = async () => {
                     <span class="text-sm font-normal text-[#86868B] mr-1">฿</span>{{ itemData.price.toFixed(2) }}
                   </p>
 
-                  <!-- Add to Cart Button - Updated to use < for validation instead of <= -->
+                  <!-- Add to Cart Button -->
                   <UButton size="md" color="primary" variant="soft" icon="i-heroicons-plus" @click="() => {
-                    const existItem = current_order.find(item => item.id === itemData.id);
+                    const existItem = current_order.find((orderItem) => orderItem.id === itemData.id);
                     const currentQty = existItem ? existItem.quantity : 0;
-                    // Use < instead of <= for main grid button
                     if (currentQty < itemData.total) {
                       add_to_order(itemData);
                     }
                   }"
-                    :disabled="(current_order.find(item => item.id === itemData.id)?.quantity || 0) >= itemData.total || itemData.total <= 0"
+                    :disabled="(current_order.find(orderItem => orderItem.id === itemData.id)?.quantity || 0) >= itemData.total || itemData.total <= 0"
                     :ui="{
                       base: 'rounded-full transition-all duration-200 bg-[#0071E3] text-white hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
                     }" class="h-10 w-10 flex items-center justify-center" />
@@ -242,8 +243,8 @@ const submitForm = async () => {
                         base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full'
                       }" />
                     <input v-model.number="orderItem.quantity" type="number" min="1"
-                      :max="item.find(i => i.id === orderItem.id)?.total || 1" @input="(e) => {
-                        const stockItem = item.find(i => i.id === orderItem.id);
+                      :max="item.find((i) => i.id === orderItem.id)?.total || 1" @input="() => {
+                        const stockItem = item.find((i) => i.id === orderItem.id);
                         const maxQty = stockItem?.total || 1;
                         // Ensure quantity doesn't exceed stock
                         if (orderItem.quantity > maxQty) {
@@ -255,13 +256,13 @@ const submitForm = async () => {
                         }
                       }" class="text-sm font-medium w-10 text-center bg-transparent focus:outline-none" />
                     <UButton color="primary" variant="ghost" size="xs" icon="i-heroicons-plus-small" @click="() => {
-                      const stockItem = item.find(i => i.id === orderItem.id);
+                      const stockItem = item.find((i) => i.id === orderItem.id);
                       if (stockItem && vaildate_qutity({ ...orderItem, quantity: orderItem.quantity + 1 }, stockItem)) {
                         orderItem.quantity++;
                       }
-                    }" :disabled="!item.find(i => i.id === orderItem.id) ||
+                    }" :disabled="!item.find((i) => i.id === orderItem.id) ||
                       !vaildate_qutity({ ...orderItem, quantity: orderItem.quantity + 1 },
-                        item.find(i => i.id === orderItem.id)!)" class="h-6 w-6" :ui="{
+                        item.find((i) => i.id === orderItem.id)!)" class="h-6 w-6" :ui="{
                           base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full disabled:opacity-50 disabled:cursor-not-allowed'
                         }" />
                   </div>
@@ -291,7 +292,7 @@ const submitForm = async () => {
           <!-- Total -->
           <div class="flex justify-between font-medium text-black">
             <span>Total</span>
-            <span class="text-[#007AFF]">฿{{ (total_price).toFixed(2) }}</span>
+            <span class="text-[#007AFF]">฿{{ total_price.toFixed(2) }}</span>
           </div>
         </div>
 
@@ -304,6 +305,5 @@ const submitForm = async () => {
         </UButton>
       </div>
     </div>
-
   </div>
 </template>

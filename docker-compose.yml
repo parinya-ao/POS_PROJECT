@@ -4,3 +4,11 @@ services:
     build: ./POS_BACKEND
     ports:
       - "8000:8000"
+    volumes:
+      - ./POS_BACKEND/database:/code/database
+    environment:
+      - SQLFILENAME=/code/database/database.db
+  frontend:
+    build: ./POS_FRONTEND
+    ports:
+      - "3000:3000"
