@@ -14,8 +14,7 @@ from database import Transaction
 
 class create_transaction(SQLModel):
     item_id: int = None
-    quantity_sold: int = None
-    sold_at: datetime = None
+    quantity: int = None
 
 
 router = APIRouter(
@@ -45,15 +44,17 @@ async def get_item_transaction(
     return result
 
 
-@router.post("/{item_id}")
-async def log_sell(item_id: int, quantity: int, session: SessionDep):
-    item = session.get(Item, item_id)
+@router.post("/")
+async def log_sell(transaction: create_transaction, session: SessionDep):
+    item = session.get(Item, transaction.item_id)
     if not item:
         raise HTTPException(status_code=404, detail="item not found")
-    if quantity > item.total:
+    if transaction.quantity > item.total:
         raise HTTPException(status_code=404, detail="item เกิน")
     transaction = Transaction(
-        item_id=item_id, quantity=quantity, sold_at=datetime.now()
+        item_id=transaction.item_id,
+        quantity=transaction.quantity,
+        sold_at=datetime.now(),
     )
     session.add(transaction)
     session.commit()

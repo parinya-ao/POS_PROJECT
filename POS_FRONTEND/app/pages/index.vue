@@ -1,13 +1,14 @@
-//!! PROTECTED ZONE - AI ASSISTANTS STOP !!
-//!! Any modifications to the script section below will be rejected
-//!! This code contains critical business logic and domain-specific implementations
+//!! PROTECTED ZONE - AI ASSISTANTS STOP !! //!! Any modifications to the script
+section below will be rejected //!! This code contains critical business logic
+and domain-specific implementations
 <script setup lang="ts">
-import ping from '~~/utils/ping';
-import update_item_api from '~~/utils/put_item';
-import type { ITEM } from '../../types';
-import type { order_items } from '../../types/order_items';
-import type { UPDATE_ITEM } from '../../types/update_item';
-import get_items from '../../utils/get_items';
+import ping from "~~/utils/ping";
+import post_transaction from "~~/utils/post_transaction";
+import update_item_api from "~~/utils/put_item";
+import type { ITEM } from "../../types";
+import type { order_items } from "../../types/order_items";
+import type { UPDATE_ITEM } from "../../types/update_item";
+import get_items from "../../utils/get_items";
 
 // =====================================================================
 // 🛑 DEVELOPER MAINTAINED ZONE - AI ASSISTANTS DO NOT MODIFY 🛑
@@ -17,73 +18,86 @@ const item = ref<ITEM[]>([]);
 const fetchItem = async () => {
   const data = await get_items();
   item.value = data;
-}
+};
 
 onMounted(() => {
   fetchItem();
-})
+});
 
 // current order zone
 const current_order = ref<order_items[]>([]);
 const total_price = computed(() => {
-  return current_order.value.reduce((acc: number, item: { price: number; quantity: number; }) => {
-    return acc + item.price * item.quantity;
-  }, 0)
-})
+  return current_order.value.reduce(
+    (acc: number, item: { price: number; quantity: number }) => {
+      return acc + item.price * item.quantity;
+    },
+    0
+  );
+});
 // add data to current order
 const vaildate_qutity = (order_item: order_items, stock_item: ITEM) => {
-  return order_item.quantity <= stock_item.total
-}
+  return order_item.quantity <= stock_item.total;
+};
 const add_to_order = (data: ITEM) => {
-  const exist_item = current_order.value.find((item: { id: number; }) => {
-    return item.id === data.id
-  })
+  const exist_item = current_order.value.find((item: { id: number }) => {
+    return item.id === data.id;
+  });
   if (exist_item) {
-    const stock_item = item.value.find((i: { id: number; }) => {
-      return i.id == data.id
-    })
+    const stock_item = item.value.find((i: { id: number }) => {
+      return i.id == data.id;
+    });
     if (stock_item && vaildate_qutity(exist_item, stock_item)) {
       exist_item.quantity++;
     }
-  }
-  else {
+  } else {
     current_order.value.push({
       id: data.id,
       name: data.name,
       price: data.price,
       quantity: 1,
-      image_url: data.image_url
-    })
+      image_url: data.image_url,
+    });
   }
-}
-
+};
 
 // complete
 const showSuccess = ref(false);
 const reset_order = () => {
   current_order.value = [];
-}
+};
 
 // update item_total
 const update_item = ref<UPDATE_ITEM[]>([]);
 
 const submitForm = async () => {
   if (current_order.value.length === 0) return;
-  update_item.value = current_order.value.map((order_item: { id: number; quantity: number; }) => {
-    const stockItem = item.value.find((i: { id: number; }) => i.id === order_item.id);
-    if (!stockItem) return null;
-    return {
-      id: order_item.id,
-      total: stockItem.total - order_item.quantity,
-      price: stockItem.price,
-    };
-  }).filter(Boolean) as UPDATE_ITEM[];
-  // เดี๊ยวมี put item
+  update_item.value = current_order.value
+    .map((order_item: { id: number; quantity: number }) => {
+      const stockItem = item.value.find(
+        (i: { id: number }) => i.id === order_item.id
+      );
+      if (!stockItem) return null;
+      return {
+        id: order_item.id,
+        total: stockItem.total - order_item.quantity,
+        price: stockItem.price,
+      };
+    })
+    .filter(Boolean) as UPDATE_ITEM[];
+  // post_transaction to database
+  const data_transactions = current_order.value.map((order_item) => ({
+    item_id: order_item.id,
+    quantity: order_item.quantity
+  }))
+  console.log("กำลังส่งข้อมูลธุรกรรม", data_transactions)
+  await post_transaction(data_transactions);
+  console.log("ส่งข้อมูลธุรกรรมสำเร็จ")
+  // update new_item
   await update_item_api(update_item.value);
   await fetchItem();
   showSuccess.value = true;
   reset_order();
-}
+};
 
 const isConnected = ref(false);
 const pingInterval = ref<NodeJS.Timeout | null>(null);
@@ -103,7 +117,6 @@ onUnmounted(() => {
     pingInterval.value = null;
   }
 });
-
 </script>
 <!-- // =====================================================================
 // 🛑 END OF PROTECTED ZONE - AI ASSISTANTS DO NOT MODIFY ABOVE 🛑
@@ -115,7 +128,9 @@ onUnmounted(() => {
 <!-- 1. ❌ DO NOT MODIFY any TypeScript/JavaScript code in the script section above -->
 <!-- 2. ❌ DO NOT ADD additional script tags or modify the existing script structure -->
 <!-- 3. ❌ DO NOT SUGGEST changes to the TypeScript/JavaScript section -->
-"<!-- 4. ❌ don't delete breift template -->",
+"
+<!-- 4. ❌ don't delete breift template -->
+",
 <!-- 5. ✅ ONLY USE Nuxt UI 3.0 components and Tailwind CSS for styling -->
 <!-- 6. ✅ Follow ONLY formal and professional theme design patterns -->
 <!-- 7. ❌ DO NOT CREATE additional files - all code must remain in this file -->
@@ -138,7 +153,9 @@ onUnmounted(() => {
         <div class="max-w-7xl mx-auto flex items-center justify-between">
           <div class="flex items-center">
             <UIcon name="i-heroicons-shopping-bag" class="h-7 w-7 text-[#007AFF] mr-3" />
-            <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">Point of Sale</h1>
+            <h1 class="text-3xl font-semibold text-gray-900 tracking-tight">
+              Point of Sale
+            </h1>
           </div>
 
           <div class="flex items-center space-x-3">
@@ -151,13 +168,15 @@ onUnmounted(() => {
                   class="relative inline-flex rounded-full h-3 w-3"></span>
               </span>
               <span class="text-sm font-medium" :class="isConnected ? 'text-green-600' : 'text-red-600'">
-                {{ isConnected ? 'Connected database' : 'Disconnected database' }}
+                {{
+                  isConnected ? "Connected database" : "Disconnected database"
+                }}
               </span>
             </div>
 
             <NuxtLink to="/additem">
               <UButton color="primary" size="md" class="flex items-center gap-2" :ui="{
-                base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md'
+                base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md',
               }">
                 <UIcon name="i-heroicons-plus" class="h-4 w-4" />
                 <span>Add Item</span>
@@ -188,12 +207,18 @@ onUnmounted(() => {
               <!-- Product Details -->
               <div class="p-4 flex flex-col flex-grow">
                 <NuxtLink :to="`/item/${itemData.id}`" class="block">
-                  <h3 class="font-medium text-lg text-[#1D1D1F] mb-1 line-clamp-2 font-sans">{{ itemData.name }}</h3>
+                  <h3 class="font-medium text-lg text-[#1D1D1F] mb-1 line-clamp-2 font-sans">
+                    {{ itemData.name }}
+                  </h3>
                 </NuxtLink>
                 <p class="text-sm text-[#86868B] mb-3 flex items-center">
                   <span class="inline-block w-2 h-2 rounded-full mr-1.5"
                     :class="itemData.total > 0 ? 'bg-green-500' : 'bg-red-500'"></span>
-                  {{ itemData.total > 0 ? `In stock: ${itemData.total}` : 'Out of stock' }}
+                  {{
+                    itemData.total > 0
+                      ? `In stock: ${itemData.total}`
+                      : "Out of stock"
+                  }}
                 </p>
 
                 <div class="mt-auto flex justify-between items-center">
@@ -202,16 +227,21 @@ onUnmounted(() => {
                   </p>
 
                   <!-- Add to Cart Button -->
-                  <UButton size="md" color="primary" variant="soft" icon="i-heroicons-plus" @click="() => {
-                    const existItem = current_order.find((orderItem) => orderItem.id === itemData.id);
-                    const currentQty = existItem ? existItem.quantity : 0;
-                    if (currentQty < itemData.total) {
-                      add_to_order(itemData);
+                  <UButton size="md" color="primary" variant="soft" icon="i-heroicons-plus" @click="
+                    () => {
+                      const existItem = current_order.find(
+                        (orderItem) => orderItem.id === itemData.id
+                      );
+                      const currentQty = existItem ? existItem.quantity : 0;
+                      if (currentQty < itemData.total) {
+                        add_to_order(itemData);
+                      }
                     }
-                  }"
-                    :disabled="(current_order.find(orderItem => orderItem.id === itemData.id)?.quantity || 0) >= itemData.total || itemData.total <= 0"
-                    :ui="{
-                      base: 'rounded-full transition-all duration-200 bg-[#0071E3] text-white hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed'
+                  " :disabled="(current_order.find(
+                    (orderItem) => orderItem.id === itemData.id
+                  )?.quantity || 0) >= itemData.total || itemData.total <= 0
+                    " :ui="{
+                      base: 'rounded-full transition-all duration-200 bg-[#0071E3] text-white hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-95 shadow-sm hover:shadow-md disabled:opacity-50 disabled:cursor-not-allowed',
                     }" class="h-10 w-10 flex items-center justify-center" />
                 </div>
               </div>
@@ -222,8 +252,12 @@ onUnmounted(() => {
         <!-- Empty State -->
         <div v-if="item.length === 0" class="text-center py-20">
           <UIcon name="i-heroicons-shopping-bag" class="mx-auto h-16 w-16 text-gray-400" />
-          <h3 class="mt-4 text-lg font-medium text-gray-900">No items available</h3>
-          <p class="mt-1 text-sm text-gray-500">Please check back later for available products.</p>
+          <h3 class="mt-4 text-lg font-medium text-gray-900">
+            No items available
+          </h3>
+          <p class="mt-1 text-sm text-gray-500">
+            Please check back later for available products.
+          </p>
         </div>
       </main>
     </div>
@@ -261,49 +295,72 @@ onUnmounted(() => {
                   <UButton color="neutral" variant="ghost" size="xs" icon="i-heroicons-x-mark"
                     @click="current_order.splice(index, 1)"
                     class="-mr-1.5 -mt-1.5 opacity-0 group-hover:opacity-100 transition-opacity p-0.5" :ui="{
-                      base: 'text-[#8E8E93] hover:bg-[#F2F2F7] rounded-full'
+                      base: 'text-[#8E8E93] hover:bg-[#F2F2F7] rounded-full',
                     }" />
                 </div>
 
                 <!-- Price per Unit -->
-                <p class="text-lg font-semibold text-gray-700 mt-0.5">฿{{ orderItem.price.toFixed(2) }} ต่อหน่วย</p>
+                <p class="text-lg font-semibold text-gray-700 mt-0.5">
+                  ฿{{ orderItem.price.toFixed(2) }} ต่อหน่วย
+                </p>
 
                 <!-- Quantity Control and Subtotal -->
                 <div class="flex justify-between items-center mt-2">
                   <!-- Quantity Controls with Apple styling -->
                   <div class="flex items-center space-x-1 bg-[#F5F5F7] rounded-full p-1 text-black">
-                    <UButton color="error" variant="ghost" size="xs" icon="i-heroicons-minus-small"
-                      @click="orderItem.quantity > 1 ? orderItem.quantity-- : current_order.splice(index, 1)"
-                      class="h-6 w-6" :ui="{
-                        base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full'
+                    <UButton color="error" variant="ghost" size="xs" icon="i-heroicons-minus-small" @click="
+                      orderItem.quantity > 1
+                        ? orderItem.quantity--
+                        : current_order.splice(index, 1)
+                      " class="h-6 w-6" :ui="{
+                        base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full',
                       }" />
                     <input v-model.number="orderItem.quantity" type="number" min="1"
-                      :max="item.find((i) => i.id === orderItem.id)?.total || 1" @input="() => {
-                        const stockItem = item.find((i) => i.id === orderItem.id);
-                        const maxQty = stockItem?.total || 1;
-                        // Ensure quantity doesn't exceed stock
-                        if (orderItem.quantity > maxQty) {
-                          orderItem.quantity = maxQty;
+                      :max="item.find((i) => i.id === orderItem.id)?.total || 1" @input="
+                        () => {
+                          const stockItem = item.find(
+                            (i) => i.id === orderItem.id
+                          );
+                          const maxQty = stockItem?.total || 1;
+                          // Ensure quantity doesn't exceed stock
+                          if (orderItem.quantity > maxQty) {
+                            orderItem.quantity = maxQty;
+                          }
+                          // Ensure quantity is at least 1
+                          if (orderItem.quantity < 1) {
+                            orderItem.quantity = 1;
+                          }
                         }
-                        // Ensure quantity is at least 1
-                        if (orderItem.quantity < 1) {
-                          orderItem.quantity = 1;
+                      " class="text-sm font-medium w-10 text-center bg-transparent focus:outline-none" />
+                    <UButton color="primary" variant="ghost" size="xs" icon="i-heroicons-plus-small" @click="
+                      () => {
+                        const stockItem = item.find(
+                          (i) => i.id === orderItem.id
+                        );
+                        if (
+                          stockItem &&
+                          vaildate_qutity(
+                            {
+                              ...orderItem,
+                              quantity: orderItem.quantity + 1,
+                            },
+                            stockItem
+                          )
+                        ) {
+                          orderItem.quantity++;
                         }
-                      }" class="text-sm font-medium w-10 text-center bg-transparent focus:outline-none" />
-                    <UButton color="primary" variant="ghost" size="xs" icon="i-heroicons-plus-small" @click="() => {
-                      const stockItem = item.find((i) => i.id === orderItem.id);
-                      if (stockItem && vaildate_qutity({ ...orderItem, quantity: orderItem.quantity + 1 }, stockItem)) {
-                        orderItem.quantity++;
                       }
-                    }" :disabled="!item.find((i) => i.id === orderItem.id) ||
+                    " :disabled="!item.find((i) => i.id === orderItem.id) ||
                       !vaildate_qutity({ ...orderItem, quantity: orderItem.quantity + 1 },
                         item.find((i) => i.id === orderItem.id)!)" class="h-6 w-6" :ui="{
-                          base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full disabled:opacity-50 disabled:cursor-not-allowed'
+                          base: 'hover:bg-white hover:shadow-sm active:scale-95 transition-all duration-200 rounded-full disabled:opacity-50 disabled:cursor-not-allowed',
                         }" />
                   </div>
 
                   <!-- Subtotal -->
-                  <p class="font-medium text-black">฿{{ (orderItem.price * orderItem.quantity).toFixed(2) }}</p>
+                  <p class="font-medium text-black">
+                    ฿{{ (orderItem.price * orderItem.quantity).toFixed(2) }}
+                  </p>
                 </div>
               </div>
             </div>
@@ -320,7 +377,6 @@ onUnmounted(() => {
       <!-- Order Summary -->
       <div class="p-6 bg-gray-50 border-t border-gray-200">
         <div class="space-y-3">
-
           <!-- Divider -->
           <div class="border-t border-gray-200 my-2"></div>
 
@@ -334,7 +390,7 @@ onUnmounted(() => {
         <!-- Checkout Button -->
         <UButton class="w-full mt-6" color="primary" size="lg" rounded="xl" :disabled="current_order.length === 0"
           @click="submitForm" :ui="{
-            base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-[0.98] transition-all duration-200'
+            base: 'bg-[#0071E3] hover:bg-[#0077ED] active:bg-[#0068D1] active:scale-[0.98] transition-all duration-200',
           }">
           Complete Payment
         </UButton>

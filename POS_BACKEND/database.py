@@ -50,5 +50,5 @@ class Item(SQLModel, table=True):
 class Transaction(SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)
     item_id: int = Field(foreign_key="item.id")
-    quantity_sold: int
+    quantity: int
     sold_at: datetime = Field(default_factory=datetime.now, index=True)

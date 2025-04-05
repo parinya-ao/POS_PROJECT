@@ -5,7 +5,7 @@ const post_item = async (input_item: CREATE_ITEM) => {
   const config = useRuntimeConfig();
   const { name, total, type_item, price, expiration_date, image_url } =
     input_item;
-  const { data } = await axios.post(
+  const { data: responseData } = await axios.post(
     `${config.public.url}/items/`,
     {
       name: name,
@@ -22,6 +22,7 @@ const post_item = async (input_item: CREATE_ITEM) => {
       },
     }
   );
+  return responseData;
 };
 
 export default post_item;
