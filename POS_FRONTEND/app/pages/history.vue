@@ -132,10 +132,10 @@ onMounted(() => {
                 </div>
                 <div class="flex items-center space-x-3">
                     <NuxtLink to="/">
-                        <UButton color="neutral" variant="soft" size="md" class="flex items-center gap-2 px-4 py-2" :ui="{
-                            base: 'bg-white border border-gray-200 hover:bg-[#F2F2F7] active:bg-[#E5E5EA] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md text-[#1D1D1F] font-medium',
+                        <UButton color="warning" variant="link" size="md" class="flex items-center gap-2" :ui="{
+                            base: 'bg-[#F5F5F7] hover:bg-[#E5E5EA] active:bg-[#D1D1D6] active:scale-95 transition-all duration-200 shadow-sm hover:shadow-md',
                         }">
-                            <UIcon name="i-heroicons-arrow-left" class="h-4 w-4 text-[#007AFF]" />
+                            <UIcon name="i-heroicons-arrow-left" class="h-4 w-4" />
                             <span>Back to POS</span>
                         </UButton>
                     </NuxtLink>
@@ -151,7 +151,7 @@ onMounted(() => {
                     class="bg-white rounded-2xl shadow-sm p-6 border border-[#F2F2F7] hover:shadow-md transition-all duration-300">
                     <div class="flex items-center">
                         <div class="w-12 h-12 rounded-full bg-[#007AFF]/10 flex items-center justify-center mr-4">
-                            <UIcon name="i-heroicons-document-text" class="h-6 w-6 text-[#007AFF]" />
+                            <UIcon name="i-heroicons-receipt" class="h-6 w-6 text-[#007AFF]" />
                         </div>
                         <div>
                             <p class="text-[#8E8E93] text-sm font-medium">Total Transactions</p>
@@ -165,7 +165,7 @@ onMounted(() => {
                     class="bg-white rounded-2xl shadow-sm p-6 border border-[#F2F2F7] hover:shadow-md transition-all duration-300">
                     <div class="flex items-center">
                         <div class="w-12 h-12 rounded-full bg-[#34C759]/10 flex items-center justify-center mr-4">
-                            <UIcon name="i-heroicons-shopping-cart" class="h-6 w-6 text-[#34C759]" />
+                            <UIcon name="i-heroicons-shopping-bag" class="h-6 w-6 text-[#34C759]" />
                         </div>
                         <div>
                             <p class="text-[#8E8E93] text-sm font-medium">Total Items Sold</p>

@@ -32,6 +32,7 @@ const update_function = async () => {
 	try {
 		await update_item_api([update_data]);
 		alert("update ข้อมูลสำเร็จ")
+		fetch_one_item();
 	}
 	catch (error) {
 		alert("edit/[id].vue error can't update data")
@@ -130,221 +131,221 @@ const update_function = async () => {
 
 <!-- AI WRITE HERE -->
 <template>
-	<div class="min-h-screen bg-white">
-		<!-- Top navigation bar with subtle shadow -->
-		<div class="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm">
-			<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
-				<div class="flex items-center justify-between h-16">
-					<!-- Back button -->
-					<NuxtLink to="/">
-						<UButton color="primary" variant="ghost" size="md" class="group flex items-center gap-2" :ui="{
-							base: 'hover:bg-gray-50 active:scale-95 transition-all duration-200'
-						}">
-							<UIcon name="i-heroicons-arrow-left"
-								class="h-5 w-5 text-[#007AFF] transition-transform group-hover:-translate-x-0.5" />
-							<span class="text-[#007AFF]">กลับไปหน้าหลัก</span>
-						</UButton>
+	<div class="min-h-screen bg-[#f5f5f7] flex flex-col">
+		<!-- Header Section with Back Button -->
+		<header class="py-6 px-8 bg-white shadow-sm sticky top-0 z-10">
+			<div class="max-w-7xl mx-auto flex items-center justify-between">
+				<div class="flex items-center">
+					<NuxtLink to="/"
+						class="mr-4 text-[#007AFF] hover:text-[#0062CC] transition-colors duration-200 flex items-center">
+						<UIcon name="i-heroicons-arrow-left" class="h-5 w-5" />
+						<span class="ml-1 text-sm font-medium">Back</span>
 					</NuxtLink>
+					<h1 class="text-2xl font-semibold text-gray-900 tracking-tight">Edit Item</h1>
+				</div>
+				<UBadge color="primary" variant="soft" size="md" v-if="data_item">
+					ID: {{ id }}
+				</UBadge>
+			</div>
+		</header>
 
-					<!-- Page title -->
-					<h1 class="text-xl font-medium text-gray-900">แก้ไขข้อมูลสินค้า</h1>
+		<!-- Loading State - Elegant and Animated -->
+		<div v-if="!data_item" class="flex-1 flex flex-col items-center justify-center p-8">
+			<div class="w-full max-w-4xl bg-white rounded-xl shadow-sm p-8">
+				<div class="animate-pulse space-y-8">
+					<div class="md:flex gap-8">
+						<!-- Image Placeholder -->
+						<div class="md:w-1/2 bg-gray-200 rounded-lg h-80"></div>
 
-					<!-- Item ID badge -->
-					<UBadge color="primary" variant="soft" size="md" v-if="data_item">
-						ID: {{ id }}
-					</UBadge>
+						<!-- Content Placeholder -->
+						<div class="md:w-1/2 space-y-6 mt-6 md:mt-0">
+							<div class="space-y-3">
+								<div class="h-8 bg-gray-200 rounded w-3/4"></div>
+								<div class="h-6 bg-gray-200 rounded w-1/3"></div>
+							</div>
+
+							<div class="h-4 bg-gray-200 rounded w-1/4"></div>
+
+							<div class="space-y-2">
+								<div class="h-2 bg-gray-200 rounded-full w-full"></div>
+								<div class="h-4 bg-gray-200 rounded w-24"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+
+				<div class="mt-8 flex justify-center items-center">
+					<div class="animate-spin rounded-full h-8 w-8 border-b-2 border-[#007AFF]"></div>
+					<span class="ml-3 text-gray-500 font-medium">Loading item details...</span>
 				</div>
 			</div>
 		</div>
 
-		<!-- Main content area -->
-		<div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-			<!-- Loading state -->
-			<div v-if="!data_item" class="flex flex-col items-center justify-center py-32">
-				<div class="w-16 h-16 relative">
-					<div class="absolute inset-0 rounded-full border-4 border-gray-100"></div>
-					<div class="absolute inset-0 rounded-full border-4 border-[#007AFF] border-t-transparent animate-spin"></div>
-				</div>
-				<p class="mt-6 text-gray-500 text-lg">กำลังโหลดข้อมูลสินค้า...</p>
-			</div>
+		<!-- Main Content - Item Edit Form -->
+		<main v-else class="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+			<div class="bg-white rounded-xl shadow-sm overflow-hidden">
+				<div class="md:flex">
+					<!-- Item Image -->
+					<div class="md:w-1/2 bg-white flex items-center justify-center p-8 border-r border-gray-100">
+						<div class="relative w-full h-96 flex items-center justify-center rounded-xl overflow-hidden bg-gray-50">
+							<img v-if="data_item.image_url" :src="data_item.image_url" :alt="data_item.name"
+								class="object-contain max-h-full max-w-full transition-all duration-300 hover:scale-105" />
+							<div v-else class="w-full h-full bg-gray-100 rounded-lg flex items-center justify-center">
+								<UIcon name="i-heroicons-photo" class="h-24 w-24 text-gray-300" />
+							</div>
 
-			<!-- Content when data is loaded -->
-			<div v-else class="space-y-8">
-				<!-- Item header section -->
-				<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-					<div>
-						<h1 class="text-2xl sm:text-3xl font-semibold text-gray-900">{{ data_item.name }}</h1>
-						<div class="flex flex-wrap items-center gap-3 mt-2">
-							<UBadge color="primary" variant="soft" size="md">{{ data_item.type }}</UBadge>
-							<UBadge :color="data_item.total > 0 ? 'success' : 'error'" size="md">
-								{{ data_item.total > 0 ? `มีสินค้า: ${data_item.total} หน่วย` : 'สินค้าหมด' }}
+							<!-- Item Type Badge (Overlay) -->
+							<UBadge v-if="data_item.type" color="neutral" variant="solid"
+								class="absolute top-4 right-4 text-xs font-medium px-3 py-1 shadow-sm bg-white text-gray-800">
+								{{ data_item.type }}
 							</UBadge>
-							<span class="text-sm text-gray-500">อัพเดทล่าสุด: {{ new Date(data_item.update_at).toLocaleString('th-TH')
-							}}</span>
 						</div>
 					</div>
 
-					<div class="flex justify-end space-x-3">
-						<NuxtLink :to="`/item/${id}`">
-							<UButton color="neutral" variant="soft" :ui="{
-								base: 'rounded-full transition-all duration-200'
-							}">
-								<UIcon name="i-heroicons-eye" class="mr-1.5 h-4 w-4" />
-								ดูสินค้า
-							</UButton>
-						</NuxtLink>
-					</div>
-				</div>
-
-				<!-- Main edit form -->
-				<div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-					<!-- Left column - Image (Read-only) -->
-					<div class="lg:col-span-1">
-						<div class="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
-							<!-- Image preview -->
-							<div class="aspect-square relative overflow-hidden bg-gray-50">
-								<img v-if="data_item.image_url" :src="data_item.image_url" :alt="data_item.name"
-									class="w-full h-full object-contain" />
-								<div v-else class="w-full h-full flex items-center justify-center">
-									<UIcon name="i-heroicons-photo" class="h-20 w-20 text-gray-300" />
+					<!-- Item Edit Form -->
+					<div class="md:w-1/2 p-8 flex flex-col">
+						<div class="flex-1">
+							<!-- Item Name (Read-only) -->
+							<div class="border-b border-gray-100 pb-6">
+								<h2 class="text-3xl font-semibold text-gray-900 tracking-tight">{{ data_item.name }}</h2>
+								<div class="mt-2 flex items-baseline">
+									<UBadge color="primary" variant="soft">
+										{{ data_item.type }}
+									</UBadge>
+									<span class="text-sm text-gray-500 ml-2">Last updated: {{ new
+										Date(data_item.update_at).toLocaleDateString() }}</span>
 								</div>
 							</div>
 
-							<!-- Image URL display (Read-only) -->
-							<div class="p-4 border-t border-gray-100">
-								<div class="space-y-2">
-									<label class="block text-sm font-medium text-gray-700">รูปภาพสินค้า (URL)</label>
-									<p class="text-sm text-gray-500 break-all">{{ data_item.image_url || 'ไม่มีรูปภาพ' }}</p>
-								</div>
-							</div>
-						</div>
-					</div>
-
-					<!-- Right column - Form fields -->
-					<div class="lg:col-span-2">
-						<form @submit.prevent="update_function" class="bg-white border border-gray-200 rounded-2xl shadow-sm p-6">
-							<div class="space-y-6">
-								<!-- Product name (Read-only) -->
-								<div>
-									<label class="block text-sm font-medium text-gray-700 mb-1">ชื่อสินค้า</label>
-									<p class="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-700">{{ data_item.name }}</p>
-								</div>
-
-								<!-- Two column layout - Only Editable Fields -->
-								<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-									<!-- Price Input - EDITABLE -->
-									<div>
-										<label class="block text-sm font-medium text-gray-700 mb-1">ราคา (บาท) <span
-												class="text-red-500">*</span></label>
-										<UInput v-model="data_item.price" type="number" min="0" step="1" size="lg" :ui="{
-											base: 'rounded-xl transition-all duration-200',
-											trailing: 'cursor-pointer'
-										}">
-											<template #trailing>
-												<span class="text-gray-400">฿</span>
-											</template>
-										</UInput>
+							<!-- Editable Fields -->
+							<div class="py-6 space-y-6 border-b border-gray-100">
+								<!-- Price Field -->
+								<div
+									class="bg-blue-50 p-6 rounded-xl border border-blue-100 shadow-inner hover:shadow-md transition-all duration-300">
+									<label class="block text-md font-semibold text-gray-900 mb-3 flex items-center" for="price-input">
+										<UIcon name="i-heroicons-currency-dollar" class="h-5 w-5 mr-2 text-[#007AFF]" />
+										Price (฿)
+									</label>
+									<div class="relative">
+										<input id="price-input" v-model="data_item.price" type="number" min="0" placeholder="Enter price"
+											class="w-full rounded-xl transition-all duration-200 border-2 border-blue-200 shadow-sm hover:shadow-md py-4 px-3 text-xl font-bold bg-white text-gray-900 focus:outline-none focus:border-[#007AFF] focus:ring-2 focus:ring-[#007AFF]/20 pr-12" />
+										<span
+											class="absolute right-4 top-1/2 transform -translate-y-1/2 text-lg font-bold text-[#007AFF]">฿</span>
 									</div>
-
-									<!-- Stock quantity - EDITABLE -->
-									<div>
-										<label class="block text-sm font-medium text-gray-700 mb-1">จำนวนในสต็อก <span
-												class="text-red-500">*</span></label>
-										<UInput v-model="data_item.total" type="number" min="0" size="lg"
-											:ui="{ base: 'rounded-xl transition-all duration-200' }" />
-									</div>
-								</div>
-
-								<!-- Expiration date (Read-only) -->
-								<div v-if="data_item.expiration_date">
-									<label class="block text-sm font-medium text-gray-700 mb-1">วันหมดอายุ</label>
-									<p class="p-3 border border-gray-200 rounded-xl bg-gray-50 text-gray-700">
-										{{ new Date(data_item.expiration_date).toLocaleDateString('th-TH', {
-											year: 'numeric',
-											month: 'long',
-											day: 'numeric'
-										}) }}
+									<p class="text-xs text-gray-500 mt-2 flex items-center">
+										<UIcon name="i-heroicons-information-circle" class="h-3.5 w-3.5 mr-1 text-blue-400" />
+										Enter the price per unit in Thai Baht
 									</p>
 								</div>
 
-								<!-- Summary box -->
-								<div class="rounded-xl bg-gray-50 p-4 border border-gray-100">
-									<h3 class="font-medium text-gray-900 mb-3">ข้อมูลที่จะอัปเดต</h3>
+								<!-- Stock Quantity Field -->
+								<div
+									class="bg-green-50 p-6 rounded-xl border border-green-100 shadow-inner hover:shadow-md transition-all duration-300">
+									<label class="block text-md font-semibold text-gray-900 mb-3 flex items-center" for="quantity-input">
+										<UIcon name="i-heroicons-cube" class="h-5 w-5 mr-2 text-[#34C759]" />
+										Stock Quantity
+									</label>
+									<input id="quantity-input" v-model="data_item.total" type="number" min="0"
+										placeholder="Enter stock quantity"
+										class="w-full rounded-xl transition-all duration-200 border-2 border-green-200 shadow-sm hover:shadow-md py-4 px-3 text-xl font-bold bg-white text-gray-900 focus:outline-none focus:border-[#34C759] focus:ring-2 focus:ring-[#34C759]/20" />
+									<p class="text-xs text-gray-500 mt-2 flex items-center">
+										<UIcon name="i-heroicons-information-circle" class="h-3.5 w-3.5 mr-1 text-green-400" />
+										Enter the available quantity in stock
+									</p>
+								</div>
 
-									<div class="grid grid-cols-2 gap-4">
-										<div>
-											<p class="text-sm text-gray-500">ราคาต่อหน่วย:</p>
-											<p class="font-medium text-gray-900">
-												฿{{ data_item.price.toLocaleString('th-TH', {
-													minimumFractionDigits: 0,
-													maximumFractionDigits: 0
-												}) }}
-											</p>
-										</div>
-
-										<div>
-											<p class="text-sm text-gray-500">จำนวนคงเหลือ:</p>
-											<p class="font-medium text-gray-900">{{ data_item.total }} หน่วย</p>
-										</div>
-
-										<div>
-											<p class="text-sm text-gray-500">มูลค่ารวม:</p>
-											<p class="font-medium text-gray-900">
-												฿{{ (data_item.price * data_item.total).toLocaleString('th-TH', {
-													minimumFractionDigits: 0,
-													maximumFractionDigits: 0
-												}) }}
-											</p>
-										</div>
-
-										<div>
-											<p class="text-sm text-gray-500">สถานะ:</p>
-											<UBadge :color="data_item.total > 0 ? 'success' : 'error'" size="sm">
-												{{ data_item.total > 0 ? 'มีสินค้า' : 'สินค้าหมด' }}
-											</UBadge>
-										</div>
+								<!-- Stock Level Indicator -->
+								<div>
+									<div class="flex items-center justify-between mb-2">
+										<h3 class="text-sm font-medium text-gray-900">Stock Level</h3>
+										<span class="text-sm font-medium" :class="[
+											data_item.total > 10 ? 'text-[#34C759]' :
+												data_item.total > 5 ? 'text-[#FF9500]' : 'text-[#FF3B30]'
+										]">
+											{{ data_item.total }} units
+										</span>
+									</div>
+									<div class="h-2 bg-gray-100 rounded-full overflow-hidden">
+										<div :class="[
+											'h-full rounded-full',
+											data_item.total > 10 ? 'bg-[#34C759]' :
+												data_item.total > 5 ? 'bg-[#FF9500]' : 'bg-[#FF3B30]'
+										]" :style="`width: ${Math.min(data_item.total / 20 * 100, 100)}%`"></div>
 									</div>
 								</div>
 
-								<!-- Action buttons -->
-								<div>
-									<UButton type="submit" color="primary" block size="lg" :ui="{
-										base: 'rounded-xl shadow-sm hover:shadow transition-all duration-200 transform hover:scale-[1.01] active:scale-[0.99]',
-									}">
-										<UIcon name="i-heroicons-check-circle" class="mr-1.5 h-5 w-5" />
-										บันทึกการเปลี่ยนแปลง
-									</UButton>
+								<!-- Total Value -->
+								<div class="bg-gray-50 p-4 rounded-xl border border-gray-100">
+									<div class="flex items-center justify-between">
+										<span class="text-sm text-gray-500">Total Inventory Value:</span>
+										<span class="text-lg font-semibold text-[#007AFF]">
+											฿{{ (data_item.price * data_item.total).toLocaleString(undefined, {
+												minimumFractionDigits: 0,
+												maximumFractionDigits: 0
+											}) }}
+										</span>
+									</div>
 								</div>
 							</div>
-						</form>
 
-						<!-- Help section -->
-						<div class="mt-6 bg-blue-50 rounded-2xl p-4">
-							<div class="flex">
-								<UIcon name="i-heroicons-light-bulb" class="text-[#007AFF] mr-3 h-5 w-5 flex-shrink-0 mt-0.5" />
-								<div>
-									<h3 class="text-sm font-medium text-gray-900">คำแนะนำในการแก้ไขสินค้า</h3>
-									<ul class="mt-2 space-y-2 text-sm text-gray-600">
-										<li class="flex items-start">
-											<UIcon name="i-heroicons-check-circle" class="mr-2 h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-											<span>คุณสามารถแก้ไขได้เฉพาะราคาและจำนวนสินค้าเท่านั้น</span>
-										</li>
-										<li class="flex items-start">
-											<UIcon name="i-heroicons-check-circle" class="mr-2 h-4 w-4 text-green-500 mt-0.5 flex-shrink-0" />
-											<span>การเปลี่ยนแปลงจำนวนสินค้าจะมีผลกับสต็อกทันที</span>
-										</li>
-										<li class="flex items-start">
-											<UIcon name="i-heroicons-exclamation-circle"
-												class="mr-2 h-4 w-4 text-amber-500 mt-0.5 flex-shrink-0" />
-											<span>หากต้องการแก้ไขข้อมูลอื่นๆ กรุณาติดต่อผู้ดูแลระบบ</span>
-										</li>
-									</ul>
-								</div>
+							<!-- Action Buttons -->
+							<div class="pt-6 space-y-4">
+								<UButton type="submit" color="primary" size="lg" block @click="update_function" :ui="{
+									base: 'bg-[#007AFF] hover:bg-[#0062CC] active:scale-[0.98] transition-all duration-200'
+								}">
+									<UIcon name="i-heroicons-check-circle" class="mr-2 h-5 w-5" />
+									Save Changes
+								</UButton>
+								<UButton color="neutral" variant="soft" size="lg" block :to="`/item/${id}`">
+									<UIcon name="i-heroicons-eye" class="mr-2 h-5 w-5" />
+									View Item Details
+								</UButton>
 							</div>
+						</div>
+					</div>
+
+				</div>
+
+				<!-- Help Section -->
+				<div class="mt-6 bg-blue-50 rounded-xl p-6 shadow-sm">
+					<div class="flex">
+						<UIcon name="i-heroicons-information-circle" class="h-6 w-6 text-[#007AFF] mr-3 flex-shrink-0" />
+						<div>
+							<h3 class="text-base font-medium text-gray-900 mb-2">Editing Guidelines</h3>
+							<ul class="space-y-2">
+								<li class="flex items-start">
+									<UIcon name="i-heroicons-check-circle" class="h-4 w-4 text-[#34C759] mt-1 mr-2 flex-shrink-0" />
+									<span class="text-sm text-gray-600">You can only edit the price and stock quantity of this
+										item.</span>
+								</li>
+								<li class="flex items-start">
+									<UIcon name="i-heroicons-check-circle" class="h-4 w-4 text-[#34C759] mt-1 mr-2 flex-shrink-0" />
+									<span class="text-sm text-gray-600">Changes will be reflected immediately in the inventory
+										system.</span>
+								</li>
+								<li class="flex items-start">
+									<UIcon name="i-heroicons-exclamation-triangle"
+										class="h-4 w-4 text-[#FF9500] mt-1 mr-2 flex-shrink-0" />
+									<span class="text-sm text-gray-600">To edit other item details, please contact your system
+										administrator.</span>
+								</li>
+							</ul>
 						</div>
 					</div>
 				</div>
 			</div>
-		</div>
+		</main>
+
+		<!-- Footer -->
+		<footer class="py-4 px-8 bg-white border-t border-gray-200 mt-auto">
+			<div class="max-w-7xl mx-auto flex justify-between items-center">
+				<div class="text-sm text-gray-500">
+					© {{ new Date().getFullYear() }} POS System
+				</div>
+				<div class="text-xs text-gray-400">
+					Editing Item #{{ id }}
+				</div>
+			</div>
+		</footer>
 	</div>
 </template>

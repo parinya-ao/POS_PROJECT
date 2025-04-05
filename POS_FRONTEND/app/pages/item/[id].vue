@@ -113,7 +113,7 @@ onMounted(() => {
 
 <template>
   <div class="min-h-screen bg-[#f5f5f7] flex flex-col">
-    <!-- Header Section with Back Button -->
+    <!-- Header Section with Navigation Links -->
     <header class="py-6 px-8 bg-white shadow-sm sticky top-0 z-10">
       <div class="max-w-7xl mx-auto flex items-center justify-between">
         <div class="flex items-center">
@@ -124,7 +124,20 @@ onMounted(() => {
           </NuxtLink>
           <h1 class="text-2xl font-semibold text-gray-900 tracking-tight">Item Details</h1>
         </div>
-        <UIcon name="i-heroicons-shopping-bag" class="h-6 w-6 text-[#007AFF]" />
+        <div class="flex items-center space-x-3">
+          <NuxtLink :to="`/edit/${id}`">
+            <UButton color="primary" variant="soft" size="sm" class="flex items-center gap-1">
+              <UIcon name="i-heroicons-pencil-square" class="h-4 w-4" />
+              <span>Edit Item</span>
+            </UButton>
+          </NuxtLink>
+          <NuxtLink to="/history">
+            <UButton color="gray" variant="soft" size="sm" class="flex items-center gap-1">
+              <UIcon name="i-heroicons-clock" class="h-4 w-4" />
+              <span>History</span>
+            </UButton>
+          </NuxtLink>
+        </div>
       </div>
     </header>
 
@@ -163,6 +176,15 @@ onMounted(() => {
     <!-- Main Content - Item Details -->
     <main v-else class="flex-1 py-8 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
       <div class="bg-white rounded-xl shadow-sm overflow-hidden">
+        <!-- Breadcrumb Navigation -->
+        <div class="bg-[#F5F5F7] px-6 py-3 flex items-center text-sm">
+          <NuxtLink to="/" class="text-[#007AFF] hover:text-[#0062CC] transition-colors duration-200">
+            Home
+          </NuxtLink>
+          <UIcon name="i-heroicons-chevron-right" class="h-3 w-3 mx-2 text-gray-400" />
+          <span class="text-gray-600">Item #{{ id }}</span>
+        </div>
+
         <div class="md:flex">
           <!-- Item Image -->
           <div class="md:w-1/2 bg-white flex items-center justify-center p-8 border-r border-gray-100">
@@ -219,16 +241,28 @@ onMounted(() => {
 
             <!-- Action Buttons -->
             <div class="pt-6 space-y-4">
-              <UButton color="primary" size="lg" block :disabled="one_item.total <= 0" :ui="{
-                base: 'bg-[#007AFF] hover:bg-[#0062CC] active:scale-[0.98] transition-all duration-200'
-              }">
-                <UIcon name="i-heroicons-shopping-cart" class="mr-2 h-5 w-5" />
-                {{ one_item.total > 0 ? 'Add to Cart' : 'Out of Stock' }}
-              </UButton>
-              <UButton color="neutral" variant="soft" size="lg" block to="/">
-                <UIcon name="i-heroicons-arrow-left" class="mr-2 h-5 w-5" />
-                Back to All Items
-              </UButton>
+              <NuxtLink to="/">
+                <UButton color="primary" size="lg" block :disabled="one_item.total <= 0" :ui="{
+                  base: 'bg-[#007AFF] hover:bg-[#0062CC] active:scale-[0.98] transition-all duration-200'
+                }">
+                  <UIcon name="i-heroicons-shopping-cart" class="mr-2 h-5 w-5" />
+                  {{ one_item.total > 0 ? 'Add to Cart' : 'Out of Stock' }}
+                </UButton>
+              </NuxtLink>
+              <div class="grid grid-cols-2 gap-4">
+                <NuxtLink :to="`/edit/${id}`">
+                  <UButton color="gray" variant="soft" size="lg" block>
+                    <UIcon name="i-heroicons-pencil-square" class="mr-2 h-5 w-5" />
+                    Edit Item
+                  </UButton>
+                </NuxtLink>
+                <NuxtLink to="/">
+                  <UButton color="gray" variant="soft" size="lg" block>
+                    <UIcon name="i-heroicons-arrow-left" class="mr-2 h-5 w-5" />
+                    Back
+                  </UButton>
+                </NuxtLink>
+              </div>
             </div>
           </div>
         </div>
@@ -252,15 +286,74 @@ onMounted(() => {
           </div>
         </div>
       </div>
+
+      <!-- Related Links Section -->
+      <div class="mt-8 grid grid-cols-1 md:grid-cols-3 gap-6">
+        <!-- History Link -->
+        <NuxtLink to="/history" class="block">
+          <div
+            class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all duration-300 border border-gray-100 flex items-center">
+            <div class="w-12 h-12 rounded-full bg-[#007AFF]/10 flex items-center justify-center mr-4">
+              <UIcon name="i-heroicons-clock" class="h-6 w-6 text-[#007AFF]" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">Transaction History</p>
+              <p class="text-sm text-gray-500 mt-1">View all transactions</p>
+            </div>
+            <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400 ml-auto" />
+          </div>
+        </NuxtLink>
+
+        <!-- Edit Item Link -->
+        <NuxtLink :to="`/edit/${id}`" class="block">
+          <div
+            class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all duration-300 border border-gray-100 flex items-center">
+            <div class="w-12 h-12 rounded-full bg-[#FF9500]/10 flex items-center justify-center mr-4">
+              <UIcon name="i-heroicons-pencil-square" class="h-6 w-6 text-[#FF9500]" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">Edit Item</p>
+              <p class="text-sm text-gray-500 mt-1">Update price and stock</p>
+            </div>
+            <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400 ml-auto" />
+          </div>
+        </NuxtLink>
+
+        <!-- Add New Item Link -->
+        <NuxtLink to="/additem" class="block">
+          <div
+            class="bg-white rounded-xl shadow-sm p-6 hover:shadow-md transition-all duration-300 border border-gray-100 flex items-center">
+            <div class="w-12 h-12 rounded-full bg-[#34C759]/10 flex items-center justify-center mr-4">
+              <UIcon name="i-heroicons-plus" class="h-6 w-6 text-[#34C759]" />
+            </div>
+            <div>
+              <p class="font-medium text-gray-900">Add New Item</p>
+              <p class="text-sm text-gray-500 mt-1">Create new inventory item</p>
+            </div>
+            <UIcon name="i-heroicons-arrow-right" class="h-5 w-5 text-gray-400 ml-auto" />
+          </div>
+        </NuxtLink>
+      </div>
     </main>
 
     <!-- Footer -->
     <footer class="py-4 px-8 bg-white border-t border-gray-200 mt-auto">
-      <div class="max-w-7xl mx-auto flex justify-between items-center">
+      <div class="max-w-7xl mx-auto flex flex-col md:flex-row md:justify-between items-center">
         <div class="text-sm text-gray-500">
           © {{ new Date().getFullYear() }} POS System
         </div>
-        <div class="text-xs text-gray-400">
+        <div class="flex items-center space-x-4 mt-3 md:mt-0">
+          <NuxtLink to="/" class="text-sm text-[#007AFF] hover:text-[#0062CC] transition-colors duration-200">
+            Home
+          </NuxtLink>
+          <NuxtLink to="/history" class="text-sm text-[#007AFF] hover:text-[#0062CC] transition-colors duration-200">
+            History
+          </NuxtLink>
+          <NuxtLink to="/additem" class="text-sm text-[#007AFF] hover:text-[#0062CC] transition-colors duration-200">
+            Add Item
+          </NuxtLink>
+        </div>
+        <div class="text-xs text-gray-400 mt-3 md:mt-0">
           Item #{{ id }}
         </div>
       </div>
