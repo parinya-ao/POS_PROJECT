@@ -152,5 +152,5 @@ No use or modification is permitted without explicit authorization.
 
 For inquiries about this project, please contact:
 - **Developer**: Parinya Aobaun
-- **LinkedIn** : [Parinya Aobaun](www.linkedin.com/in/parinya-aobaun)
+- **LinkedIn** : [Parinya Aobaun](https://www.linkedin.com/in/parinya-aobaun)
 
